@@ -51,7 +51,7 @@ public class redditScraper implements Runnable
    private String password = "";
 	private String submitSubreddit = "";
    private String listItem = "<li class=\"first\">";
-   private String botCode = "";
+   private String botCode = "blank";
 	boolean isActive = true;
 	
    private final CaptchaDownloader captchaDownloader = new CaptchaDownloader();
@@ -563,7 +563,7 @@ public class redditScraper implements Runnable
       }
       // Post it online. Super simple.
       RestClient restClient = new HttpRestClient();
-      restClient.setUserAgent("WRmKPqOCYRXPQA");
+      restClient.setUserAgent(botCode);
       User user = new User(restClient,userName, password); 
       try{
          user.connect();
