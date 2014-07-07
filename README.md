@@ -1,4 +1,0 @@
-RedditScraper
-=============
-
-Reddit undelete bot
