@@ -1,0 +1,9 @@
+Reddit Scraper scrapes defined subreddits for deleted posts
+
+*userInfo.txt must be filled out with the appropriate information. I'm not sure, but you
+ may need to get your own bot code at https://ssl.reddit.com/prefs/apps . If it all falls
+ under one bot code, I'll post it in the root folder
+ 
+ *all subreddits entered in the GUI textfield must end with a /
+ 
+ *Please limit the number of bots running to one per person.
