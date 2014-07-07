@@ -1,0 +1,4 @@
+User Name = 
+Password = 
+subreddit = (subreddit name, no slashes)
+botcode = 
