@@ -19,6 +19,7 @@ public class RSControlPanel extends JFrame
 	private int HEIGHT;
 	private JButton start;
 	private JButton stop;
+   private JButton clearConsole;
 	private JTextField redditLocationField;
 	private redditScraper rsScraper;
 	private Thread activeThread;
@@ -96,6 +97,18 @@ public class RSControlPanel extends JFrame
 			}
 		});
 		add(stop,c);
+      
+      c.gridx=3;
+      
+      clearConsole = new JButton("Clear Console");
+		clearConsole.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e)
+			{
+				consolePane.setBody("");
+			}
+		});
+      
+		add(clearConsole,c);
 		//---------------------------------------------
 		
 		//---------------------------------------------
@@ -103,7 +116,7 @@ public class RSControlPanel extends JFrame
 		c.gridy = 1;
 		c.weightx = 1;
 		c.weighty = 1;
-		c.gridwidth = 3;
+		c.gridwidth = 4;
 		c.fill = GridBagConstraints.BOTH;
 		
 		JPanel leftPane = new JPanel();
@@ -111,7 +124,31 @@ public class RSControlPanel extends JFrame
 		consolePane = new RSEditorPane();
 		consolePane.setContentType("text/html");
 	   consolePane.setEditable(false);
-
+	   consolePane.addHyperlinkListener(new HyperlinkListener() {
+           @Override
+           public void hyperlinkUpdate(HyperlinkEvent hle) {
+			  		System.out.println("Description: " + hle.getDescription() +
+											 "Event Type: " + hle.getEventType());
+               if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
+                   System.out.println("LINK CLICKED" + hle.getURL());
+                   Desktop desktop = Desktop.getDesktop();
+                   try {
+						 	String url = hle.getDescription();
+						 	 String httpHeader = "";
+							 if(url.contains("http://") == false && url.contains("www.") == false)
+							 {
+							 	httpHeader = "http://";
+							 }
+                      String URIConversion = httpHeader + hle.getDescription();
+                      URIConversion = URIConversion.trim();
+						 	 URI website = new URI(URIConversion);
+                      desktop.browse(website);
+                   } catch (Exception ex) {
+                       ex.printStackTrace();
+                   }
+               }
+           }
+       });
 		deletePane = new RSEditorPane();
 		deletePane.setContentType("text/html");
 	   deletePane.setEditable(false);
