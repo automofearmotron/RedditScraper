@@ -1,16 +1,10 @@
 /*
    The Reddit Scraper scours defined subreddits for deleted submissions. It uses a combination of regex'ing through
    html and posting it using a reddit API wrapper. It's not the most efficient or best practice coding, but I've
-   only had a chance to write it while at work, with short intervals.  Also going to pre-apologize for using
-	so many generic exceptions.  I'll make them more defined later. I also didn't use File pathSeparator, so right now
-	it will only write files on Windows correctly. I think. You can always comment out the file writing anyway, it's
-	only meant to create a reference of found links against ones posted in case there's a post failure by the bot.
-	If you have any questions about the code or wish to add features (I will be adding more than just scraping) let me know.
+   only had a chance to write it while at work, with short intervals. If you have any questions about the code or
+   wish to add features (I will be adding more than just scraping) let me know.
    
    /u/prototypexx
-	
-	p.s.
-	Lot's of thanks to a guy named Karan who had a nifty Java API wrapper on Github. Saved me a lot of time.
 */
 
 
@@ -42,40 +36,37 @@ import org.apache.commons.net.util.TrustManagerUtils;
 
 public class redditScraper implements Runnable
 {
-   	private String nextButton = "<span class=\"nextprev\">";
-	private String titleFinder = "<p class=\"title\">";
-	private String tabIndexFinder = "tabindex=\"1\" >";
-	private String nextPage = "";
-	private String redditLocation = "http://www.reddit.com/r/all";
+	private String redditOriginalLocation = "http://www.reddit.com/r/all";
+   private String nextButton = "<span class=\"nextprev\">";
+   private String nextPage = "";
+   private String redditLocation = "http://www.reddit.com/r/all";
 	private String redditRoot = "http://www.reddit.com/";
-	private String userName = "";
-	private String password = "";
-	private String submitSubreddit = "";
-	private String listItem = "<li class=\"first\">";
-	private String botCode = "";
+   private String userName = "prototypexx";
+   private String password = "bixbie23@reddit";
+	private String submitSubreddit = "undeleteShadow";
+   private String listItem = "<li class=\"first\">";
+   private String botCode = "WRmKPqOCYRXPQA";
 	boolean isActive = true;
 	
-	private final CaptchaDownloader captchaDownloader = new CaptchaDownloader();
+   private final CaptchaDownloader captchaDownloader = new CaptchaDownloader();
    
 	private RSEditorPane consoleRSPane;
 	private RSEditorPane deleteRSPane;
    
- 	ArrayList<RedditPost> postArray = new ArrayList<RedditPost>();
+   ArrayList<RedditPost> postArray = new ArrayList<RedditPost>();
 	ArrayList<RedditPost> pastArray = new ArrayList<RedditPost>();			// because puns
 	ArrayList<RedditPost> deletedArray = new ArrayList<RedditPost>();
    
 	// Don't set the interval too low, you will make Reddit mad
 	private int intervalPerPage = 3000;
-	private int scourIntervalMinutes = 2;
+   private int scourIntervalMinutes = 2;
 	private int postsPerView = 25;
-	private int currentRanking = 1;
-	private int iterations = 4;
-	private int lowEndScour = 95;
-	private int logCount = 0;
+   private int currentRanking = 1;
+   private int iterations = 4;
+   private int lowEndScour = 92;
    
 	public void run()
-	{
-		loadUserInfo();
+	{     
 		while(isActive)
 		{
 			scrapePages(redditLocation,postArray);
@@ -102,13 +93,8 @@ public class redditScraper implements Runnable
             // subreddit to check for deletion
 				if(currentPost.getRanking() < lowEndScour)
 				{
-					ArrayList<RedditPost> subredditCheck = new ArrayList<RedditPost>();
-					subredditCheck = scrapeSubreddit(redditRoot + currentPost.getSubreddit(), subredditCheck);
-					if(subredditCheck.contains(currentPost) == false)
-					{
-						System.out.println("Adding deleted post : " + currentPost.toString());
-						deletedInCheck.add(currentPost);
-					}
+               System.out.println("Adding deleted post : " + currentPost.toString());
+					deletedInCheck.add(currentPost);
 				}else{
 					// Since posts naturally drop out of the top 100 around 95-100, check
 					// any of the 90's for removal by checking the subreddit top
@@ -116,17 +102,17 @@ public class redditScraper implements Runnable
 					// kindly asks to minimize requests to a certain amount in a certain
 					// time.
 					ArrayList<RedditPost> subredditCheck = new ArrayList<RedditPost>();
-               		System.out.println("Scraping Subreddit : (" + redditRoot + currentPost.getSubreddit() + ") in > " + 
-                                    	lowEndScour + " scour");
+               System.out.println("Scraping Subreddit : (" + redditRoot + currentPost.getSubreddit() + ") in > " + 
+                                    lowEndScour + " scour");
 					consoleRSPane.append("Scraping Subreddit : (" + redditRoot + currentPost.getSubreddit() + ") in > " + 
-                                    				lowEndScour + " scour");
-               		// Increase iteration to check the top 125, just to be sure
-               		iterations++;
+                                    lowEndScour + " scour");
+               // Increase iteration to check the top 125, just to be sure
+               iterations++;
 					subredditCheck = scrapeSubreddit(redditRoot + currentPost.getSubreddit(), subredditCheck);
-               		iterations--;
+               iterations--;
 					if(subredditCheck.contains(currentPost) == false)
 					{
-                  		System.out.println("Adding deleted post : " + currentPost.toString());
+                  System.out.println("Adding deleted post : " + currentPost.toString());
 						deletedInCheck.add(currentPost);
 					}else{
 						
@@ -137,7 +123,7 @@ public class redditScraper implements Runnable
 		return deletedInCheck;
 	}
    
-	
+	/*
    // Loads user info from userInfo.txt (it has to be in same working directory as the program
 	public void loadUserInfo()
    {
@@ -146,29 +132,29 @@ public class redditScraper implements Runnable
       {
          try{
          BufferedReader reader = new BufferedReader(new FileReader(userInfo));
-         String line = reader.readLine();
-		// Always trim in case people add spaces by accident
-         userName = line.substring(line.indexOf("=") + 1).trim();
-         line = reader.readLine();
-         password = line.substring(line.indexOf("=") + 1).trim();
-         line = reader.readLine();
-         submitSubreddit = line.substring(line.indexOf("=") + 1).trim();
-         line = reader.readLine();
-         botCode = line.substring(line.indexOf("=") + 1).trim();
+         String line = reader.next();
+         userName = line.substring(line.indexOf("=") + 1).trim());
+         line = reader.next();
+         password = line.substring(line.indexOf("=") + 1).trim());
+         line = reader.next();
+         submitSubreddit = line.substring(line.indexOf("=") + 1).trim());
+         line = reader.next();
+         botCode = line.substring(line.indexOf("=") + 1).trim());
          }catch(Exception e)
          {
-            consoleRSPane.append("Error loading user account info. Check .txt file "+
-                                 "\n Format: " + "\nAccount Name = name\nPassword = password " +
+            consoleRSPane.append("Error loading user account info. Check .txt file +
+                                 "\n Forma: + "\nAccount Name = name\nPassword = password +
                                    "\nSubreddit to Post = subreddit\nBot Code = botcode");
          }
       }
    }
-   
+   */
    
    // Populate the threads postArray. It's used for file writing and post submitting, along with the pastArray
    public void populatePostArray(String postings, ArrayList<RedditPost> arrayToFill)
    {
       // These expressions only hold relevence when starting from an html list item
+      Pattern titleRegex = Pattern.compile("\\w+/\"");
       Pattern commentsRegex = Pattern.compile("\\d+ comments</a>");
       Pattern subredditRegex = Pattern.compile("r/\\w+/");
       Matcher matchRegex;
@@ -178,13 +164,13 @@ public class redditScraper implements Runnable
         String currentLine = postings.substring(0,postings.indexOf("\n"));
         RedditPost currentPost = new RedditPost();
         currentPost.setRanking(currentRanking);
-
-		currentPost.setTitle(currentLine.substring(0,currentLine.indexOf("</a>")));
-		currentLine = currentLine.substring(currentLine.indexOf(listItem));
-		  
+         
+        matchRegex = titleRegex.matcher(currentLine);
+        if (matchRegex.find())
+        {
+            currentPost.setTitle(matchRegex.group(0).replace("/\"","").replace("_"," "));
+         }
         postings = postings.substring(postings.indexOf("\n") + 1);
-		currentLine = currentLine.substring(currentLine.indexOf("http"));
-		  
         currentPost.setLink(currentLine.substring(currentLine.indexOf("http"),currentLine.indexOf("/\"")));
         matchRegex = commentsRegex.matcher(currentLine);
         if(matchRegex.find())
@@ -206,45 +192,47 @@ public class redditScraper implements Runnable
    // Repeatedly loads pages in a subreddit, reading html and making RedditPost objects
    public void scrapePages(String locationIn,ArrayList<RedditPost> arrayToFill)
    {
-      // 4x25 = 100 posts. Iterations starts at 4 by default
+      // 4x25 = 100 posts. Iterations starts at 4 (3 base 0 )
       for(int i = 0;i < iterations;i++)
       {
          try{
-         	String ip = "";
-         	String ipVisual = "";
-         	System.out.println("Scraping : " + locationIn);
-			consoleRSPane.append("Scraping : " + locationIn);
-			URL redditURL = new URL(locationIn);
-			System.out.println("Test passed");
+            String ip = "";
+            String ipVisual = "";
+            System.out.println("Scraping : " + locationIn);
+				consoleRSPane.append("Scraping : " + locationIn);
+            URL redditURL = new URL(locationIn);
+   			System.out.println("Test passed");
             
-			URLConnection connection = redditURL.openConnection();
-   			connection.addRequestProperty("Protocol", "Http/1.1");
-   			connection.addRequestProperty("Connection", "keep-alive");
-   			connection.addRequestProperty("Keep-Alive", "1000");
-   			connection.addRequestProperty("User-Agent", "Web-Agent");
+   		   URLConnection connection = redditURL.openConnection();
+   		   connection.addRequestProperty("Protocol", "Http/1.1");
+   		   connection.addRequestProperty("Connection", "keep-alive");
+   		   connection.addRequestProperty("Keep-Alive", "1000");
+   		   connection.addRequestProperty("User-Agent", "Web-Agent");
             
             // It's better to not have so much code in a try block. But I still do.
-   		try{
-   			BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-   			System.out.println("Done opening input stream");
-   			if(in != null)
-   			{
-          		boolean sentinel = false;
-    			String lineAdd = in.readLine();            
+   			try{
+   				BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+   				System.out.println("Done opening input stream");
+   				if(in != null)
+   				{
+                  boolean sentinel = false;
+      				String lineAdd = in.readLine();            
 						
-           		while(sentinel == false)
-          		{
-           			if(lineAdd != null)
-           			{
-      					ip += lineAdd;
-                		lineAdd = in.readLine();
-                	}else{
-                    	sentinel = true;
-                        //System.out.println("Finished Running HTML for : " + locationIn);
-						consoleRSPane.append("Finished Running HTML for : " + locationIn);
-               		}
-                  	// check for the next button with the contains() method. This is inefficient, but
-                  	// the workload isn't high, so it's fine.
+                  while(sentinel == false)
+                  {
+                     if(lineAdd != null)
+                     {
+      					   ip += lineAdd;
+                        lineAdd = in.readLine();
+                     }else{
+                        sentinel = true;
+                        System.out.println("Finished Running HTML for : " + locationIn);
+								consoleRSPane.append("Finished Running HTML for : " + locationIn);
+                     }
+                     
+                  }
+                  // check for the next button with the contains() method. This is inefficient, but
+                  // the workload isn't high, so it's fine.
                   if(ip.contains(nextButton))
                   {
                      // The first page has no previous button
@@ -253,36 +241,34 @@ public class redditScraper implements Runnable
                         nextPage = ip.substring(ip.indexOf(nextButton));
                         nextPage = nextPage.substring(nextPage.indexOf("http"));
                         nextPage = nextPage.substring(0,nextPage.indexOf("\""));
-                        //System.out.println("NextPage " + i + " is " + nextPage);
+                        System.out.println("NextPage " + i + " is " + nextPage);
 								consoleRSPane.append("NextPage " + i + " is " + nextPage);  
                      }else{
                         // skip the first link to go to next
                         nextPage = ip.substring(ip.indexOf(nextButton));
                         nextPage = nextPage.substring(nextPage.indexOf("http") + 1);
-								//
+                        // Double the iteration to get to the next button instead of previous
                         nextPage = nextPage.substring(nextPage.indexOf("http"));
                         nextPage = nextPage.substring(0,nextPage.indexOf("\""));
-                        //System.out.println("NextPage " + i + " is " + nextPage);
-						consoleRSPane.append("NextPage " + i + " is " + nextPage);  
+                        System.out.println("NextPage " + i + " is " + nextPage);
+								consoleRSPane.append("NextPage " + i + " is " + nextPage);  
                      }
-                  	locationIn = nextPage;
+                     locationIn = nextPage;
                   }else{
-					System.out.println("Page does not contain next button");
-					System.out.println(ip);
-				 }
+							System.out.println("Page does not contain next button");
+							System.out.println(ip);
+						}
                   
                   
                   sentinel = false;
                   
-                  // Separate list items using liste item match
+                  // Separate list items
                   while(sentinel == false)
                   {
-                     try{
-						String stringToAdd = ip.substring(ip.indexOf(titleFinder));
-						String titleFullLength = ip.substring(ip.indexOf(tabIndexFinder) + tabIndexFinder.length());
-                        stringToAdd = ip.substring(ip.indexOf(listItem));
+                     try{ 
+                        String stringToAdd = ip.substring(ip.indexOf(listItem));
                         ip = ip.substring(ip.indexOf(listItem));
-                        stringToAdd = titleFullLength + stringToAdd.substring(0,stringToAdd.indexOf("</a>") + 4);
+                        stringToAdd = stringToAdd.substring(0,stringToAdd.indexOf("</a>") + 4);
                         ip = ip.substring(ip.indexOf("</a>") + 4);
                         ipVisual += stringToAdd + "\n";
                      }catch(Exception e)
@@ -307,23 +293,22 @@ public class redditScraper implements Runnable
    			}catch(IOException f)
    			{
    				System.out.println("Error establishing connection stream");
-				consoleRSPane.append("Error establishing connection stream to " + locationIn);  
+					consoleRSPane.append("Error establishing connection stream to " + locationIn);  
    			}
    		}catch(IOException e)
    		{
    			System.out.println("Error establishing overall connection");
-			consoleRSPane.append("Error establishing overall connection"); 
    		}
       }
       
       // Perform delete checks after pastArray has been filled
 		if(pastArray.size() != 0)
 		{
-        	System.out.println("Comparing Data Sets for deletes...");
+         System.out.println("Comparing Data Sets for deletes...");
 			ArrayList<RedditPost> deletesToAdd = comparePostArrays(postArray,pastArray);
 			for(int i = 0;i < deletesToAdd.size();i++)
 			{
-            	System.out.println("Deleted Test on: " + deletesToAdd.get(i).toString());
+            System.out.println("Deleted Test on: " + deletesToAdd.get(i).toString());
 				if(deletedArray.contains(deletesToAdd.get(i)) == false)
 				{
 					System.out.println("Adding Deleted post: + " + deletesToAdd.get(i) + "\n");
@@ -336,7 +321,7 @@ public class redditScraper implements Runnable
          File deletes = new File(fileName + "(Deletes).html");
          if (!deletes.exists()) {
 	         try{
-				deletes.createNewFile();//Always update file to keep a permanent reference
+				   deletes.createNewFile();//Always update file to keep a proper timestamp
 	         }catch(IOException e)
 	         {
 	         
@@ -346,8 +331,7 @@ public class redditScraper implements Runnable
          // Check over deletedArray for submissions. Posts are held on for several scrapes because sometimes posts
          // don't show up in a usual scrape, but will be there in a subsequent scrape. This causes the postings to
          // move slower than /r/undelete, which pulls it's postings through the reddit API, but this will allow us
-         // to get posts that aren't filtered by Reddit. If a post is not found, it gets a check. After 3 checks
-			// without being found, it's added to the queue for submission.
+         // to get posts that aren't filtered by Reddit.
 			for(int i = 0;i < deletedArray.size();i++)
 			{
 				if(deletedArray.get(i).isReadyToSubmit())
@@ -367,16 +351,14 @@ public class redditScraper implements Runnable
 			}
 			
          // Use an Iterator to iterate through posts to add and remove them simultaneously. You'd get index
-         // out of bounds trying to use the normal array iterations in the rest of the program.  This loop
-			// goes through the deletedArray again to remove all posts that are ready for submission from the
-			// array and submit them.
+         // out of bounds trying to use the normal array iterations in the rest of the program
 			int i = deletedArray.size();
 		    for (Iterator<RedditPost> it = deletedArray.iterator(); it.hasNext(); )
 		    {
 		        RedditPost temp = it.next(); // Add this line in your code
 		        if (temp.isReadyToRemove())
 		        {
-					System.out.println("Removing : " + temp.toString() + " from deleted submissions");
+				  		System.out.println("Removing : " + temp.toString() + " from deleted submissions");
 		            it.remove();
 		        }
 		        i++;
@@ -384,26 +366,25 @@ public class redditScraper implements Runnable
 		}
       
 		String fileName = locationIn.substring(locationIn.indexOf("r/") + 2);
-      	fileName = fileName.substring(0,fileName.indexOf("/"));
-		// Switch these two File lines to keep a constant log of the front page
-      //File frontPage = new File(fileName + logCount + "(OLD).html");
-		File frontPage = new File(fileName + "(OLD).html");
-    	logCount++;
+      fileName = fileName.substring(0,fileName.indexOf("/"));
+      File frontPage = new File(fileName + "(OLD).html");
+      
 		if (!frontPage.exists()) {
-        	try{
+         try{
 			   frontPage.createNewFile();
-         	}catch(IOException e)
-         	{
+         }catch(IOException e)
+         {
+         
          }
 		}
       
-      	writeToFile(frontPage,arrayToFill);
+      writeToFile(frontPage,arrayToFill);
   		pastArray = (ArrayList<RedditPost>)postArray.clone(); // clone. Cloning is important here.
 		postArray.clear();    
 		currentRanking = 1;
 		
-      	System.out.println("Deletes In Queue = " + deletedArray.size());
-      	consoleRSPane.append("Deletes In Queue = " + deletedArray.size());
+      System.out.println("Deletes In Queue = " + deletedArray.size());
+      consoleRSPane.append("Deletes In Queue = " + deletedArray.size());
 		System.out.println("Sleeping " + scourIntervalMinutes + " minutes");
 		consoleRSPane.append("Sleeping " + scourIntervalMinutes + " minutes");
 		try{
@@ -422,15 +403,16 @@ public class redditScraper implements Runnable
          try{
             String ip = "";
             String ipVisual = "";
-			consoleRSPane.append("Scraping Subreddit: " + locationIn);
+            System.out.println("Scraping Subreddit: " + locationIn);
+				consoleRSPane.append("Scraping Subreddit: " + locationIn);
             URL redditURL = new URL(locationIn);
    			System.out.println("Test passed");
             
-			URLConnection connection = redditURL.openConnection();
-   		    connection.addRequestProperty("Protocol", "Http/1.1");
-   		    connection.addRequestProperty("Connection", "keep-alive");
-   		    connection.addRequestProperty("Keep-Alive", "1000");
-   		    connection.addRequestProperty("User-Agent", "Web-Agent");
+   		   URLConnection connection = redditURL.openConnection();
+   		   connection.addRequestProperty("Protocol", "Http/1.1");
+   		   connection.addRequestProperty("Connection", "keep-alive");
+   		   connection.addRequestProperty("Keep-Alive", "1000");
+   		   connection.addRequestProperty("User-Agent", "Web-Agent");
    
    			try{
    				BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -443,12 +425,12 @@ public class redditScraper implements Runnable
                   {
                      if(lineAdd != null)
                      {
-      				 	ip += lineAdd;
+      					   ip += lineAdd;
                         lineAdd = in.readLine();
                      }else{
                         sentinel = true;
                         System.out.println("Finsihed Running HTML for : " + locationIn);
-						consoleRSPane.append("Finsihed Running HTML for : " + locationIn);
+								consoleRSPane.append("Finsihed Running HTML for : " + locationIn);
                      }
                      
                   }
@@ -466,26 +448,24 @@ public class redditScraper implements Runnable
                         // Double the iteration to get to the next button instead of previous
                         nextPage = nextPage.substring(nextPage.indexOf("http"));; 
                         nextPage = nextPage.substring(0,nextPage.indexOf("\""));
-                        //System.out.println("NextSubPage " + i + " is " + nextPage);
-						consoleRSPane.append("NextSubPage " + i + " is " + nextPage);               
-					}
+                        System.out.println("NextSubPage " + i + " is " + nextPage);
+								consoleRSPane.append("NextSubPage " + i + " is " + nextPage);               
+							}
                   }else{
                      System.out.println("Subreddit does not contain next button");
                      System.out.println(ip);
-					 nextPage = locationIn;
+							nextPage = locationIn;
                   }
-                  //System.out.println("Settings Subreddit Next Page to : " + nextPage);
+                  System.out.println("Settings Subreddit Next Page to : " + nextPage);
                   locationIn = nextPage;
                   sentinel = false;
                   
                   while(sentinel == false)
                   {
                      try{                        
-                        String stringToAdd = ip.substring(ip.indexOf(titleFinder));
-						String titleFullLength = ip.substring(ip.indexOf(tabIndexFinder) + tabIndexFinder.length());
-                        stringToAdd = ip.substring(ip.indexOf(listItem));
+                        String stringToAdd = ip.substring(ip.indexOf(listItem));
                         ip = ip.substring(ip.indexOf(listItem));
-                        stringToAdd = titleFullLength + stringToAdd.substring(0,stringToAdd.indexOf("</a>") + 4);
+                        stringToAdd = stringToAdd.substring(0,stringToAdd.indexOf("</a>") + 4);
                         ip = ip.substring(ip.indexOf("</a>") + 4);
                         ipVisual += stringToAdd + "\n";
                      }catch(Exception e)
@@ -495,12 +475,14 @@ public class redditScraper implements Runnable
                      
                   }
                   
-				  try{
-					Thread.sleep(intervalPerPage);
-				  }catch(InterruptedException e)
-				  {
-		   		  }
+						try{
+							Thread.sleep(intervalPerPage);
+						}catch(InterruptedException e)
+						{
+						
+						}
                   populatePostArray(ipVisual,arrayToFill);
+                  
                   in.close();
    				}else{
    					System.out.println("The input reader is null");
@@ -545,15 +527,15 @@ public class redditScraper implements Runnable
 		System.out.println("Appending delete File: " + fileIn.getAbsolutePath());
 		BufferedWriter out = null;
       
-    	try{
+      try{
    		FileWriter fw = new FileWriter(fileIn.getAbsoluteFile(),true);
    		out = new BufferedWriter(fw);
-		if(postIn.isReadyToSubmit())
-		{
+			if(postIn.isReadyToSubmit())
+			{
       		out.append(postIn.toString());
-			deleteRSPane.append(postIn.toString());
-			// add html anchors to make clickable links in logs and delete pane
+				deleteRSPane.append(postIn.toString());
       		out.append("\n\t" + "<a href=\"" + postIn.getLink() + "\">" + postIn.getLink() + "</a>" + "\n");
+				//deleteRSPane.append(postIn.getLink());
             deleteRSPane.append("<a href=\"" + postIn.getLink() + "\">" + postIn.getLink() + "</a>" + "\n");
 			}else{
 				if(postArray.contains(postIn) == false)
@@ -570,15 +552,17 @@ public class redditScraper implements Runnable
       }
       // Post it online. Super simple.
       RestClient restClient = new HttpRestClient();
-	  // Bot code here, make sure to add your own unique version number in userInfo.txt
-      restClient.setUserAgent(botCode);
+      restClient.setUserAgent("WRmKPqOCYRXPQA");
       User user = new User(restClient,userName, password); 
       try{
          user.connect();
-         user.submitLink(postIn.toString(),postIn.getLink(),submitSubreddit);
+         user.submitLink(
+                postIn.getRanking() + " | " + postIn.getTitle() + " " + postIn.getSubreddit() + " " + postIn.getNumberOfComments(),
+                postIn.getLink(),//.replace("www.reddit.com","www.np.reddit.com"), it's a deleted post, np isn't relevent
+                submitSubreddit);
          // If you require captcha fill-in, this will generate a .png of the appropriate captcha. This feature will
-         // be useful if your bot isn't posting and you don't know why. Karma, baby. It's the karma.
-         
+         // be added later.
+         /*
          Captcha cappyCap = new Captcha(restClient,captchaDownloader);
          if(cappyCap.needsCaptcha(user))
          {
@@ -586,11 +570,17 @@ public class redditScraper implements Runnable
             consoleRSPane.append("Requires Captcha!");
             String iden = cappyCap.newCaptcha(user);
             captchaDownloader.getCaptchaImage(iden);
+            if(cappyCap.needsCaptcha(user) == false)
+            {
+               System.out.println("Post success!");
+               consoleRSPane.append("Post success!");
+            }
+            
          }else{
-            System.out.println("Bot Post Sucess");
-            consoleRSPane.append("Bot Post Success");
+            System.out.println("Does not require Captcha first go around");
+            consoleRSPane.append("Does not require Captcha first go around");
          }
-         
+         */
       }catch(Exception e)
       {
          System.out.println("Could not connect bot");
@@ -674,23 +664,15 @@ public class redditScraper implements Runnable
    // A redditPost contains all the general information you'll likely need about a post
    public class RedditPost
    {
-  		// a list of special characters to replace. This list is growing, bear with me.    
-	  private String quotes = "&quot;";
-      private String funkyApostrophe = "’";
-      private String downArrow = "↓";
-      private String downRightArrow =  "↘";
-      private String rightArrow = "→";
-		
-		
       private String title;
       private String linkLocation;
       private String subreddit;
       private String numberOfComments;
       private int ranking;
       private boolean readyToSubmit;
-	  private boolean readyToRemove;
+		private boolean readyToRemove;
 		
-	  int checks;
+		int checks;
       
       public RedditPost()
       {
@@ -699,20 +681,20 @@ public class redditScraper implements Runnable
          subreddit = "";
          numberOfComments = "0";
          ranking = 0;
-		 readyToSubmit = false;
-		 readyToRemove = false;
-		 checks = 0;
+			readyToSubmit = false;
+			readyToRemove = false;
+			checks = 0;
       }
       
-	  public void addCheck()
-	  {
-		if(checks >= 1)
+		public void addCheck()
 		{
-			readyToSubmit = true;
-		}else{
-			checks++;
+			if(checks >= 1)
+			{
+				readyToSubmit = true;
+			}else{
+				checks++;
+			}
 		}
-	  }
       public String getTitle()
       {
          return title;
@@ -720,17 +702,6 @@ public class redditScraper implements Runnable
       
       public void setTitle(String titleIn)
       {
-			// Remove those funky characters.
-         titleIn = titleIn.replace(quotes,"\"");
-         titleIn = titleIn.replace(downArrow,"\u2193");
-         titleIn = titleIn.replace(downRightArrow,"\u2198");
-         titleIn = titleIn.replace(rightArrow,"\u2192");
-         titleIn = titleIn.replace(funkyApostrophe,"\'");     
-
-		 if(titleIn.length() >= 250)
-		 {
-			titleIn = titleIn.substring(0,250);
-		 }
          title = titleIn;
       }
       
@@ -776,46 +747,46 @@ public class redditScraper implements Runnable
       
       public String toString()
       {
-         return "[#" + ranking + "]" + "\t" + title + "\t" + "[" + subreddit + "]\t" + numberOfComments;
+         return ranking + "\t|\t" + title + "\t(" + subreddit + ") \t" + numberOfComments;
       }
 		
-	  public void setReadyToSubmit()
-	  {
-		 readyToSubmit = true;
-	  }
-		
-	  public boolean isReadyToSubmit()
-	  {
-		return readyToSubmit;
-	  }
-		
-	  public void setReadyToRemove()
-	  {
-		readyToRemove = true;
-	  }
-		
-	  public boolean isReadyToRemove()
-	  {
-	  	return readyToRemove;
-	  }
-		
-	  public boolean equals(Object postIn)
-	  {
-		if(postIn == this)
+		public void setReadyToSubmit()
 		{
-			return true;
+			readyToSubmit = true;
 		}
-		if(postIn == null || postIn.getClass() != this.getClass())
+		
+		public boolean isReadyToSubmit()
 		{
-			return false;
+			return readyToSubmit;
 		}
+		
+		public void setReadyToRemove()
+		{
+			readyToRemove = true;
+		}
+		
+		public boolean isReadyToRemove()
+		{
+			return readyToRemove;
+		}
+		
+		public boolean equals(Object postIn)
+		{
+			if(postIn == this)
+			{
+			 return true;
+			}
+			if(postIn == null || postIn.getClass() != this.getClass())
+			{
+				return false;
+			}
 			
-		RedditPost otherPost = (RedditPost)postIn;
-		if(otherPost.getLink().equals(linkLocation) && otherPost.getTitle().equals(title) && 
-		otherPost.getSubreddit().equals(subreddit))
-		{
-			return true;
-		}
+			RedditPost otherPost = (RedditPost)postIn;
+			if(otherPost.getLink().equals(linkLocation) && otherPost.getTitle().equals(title) && 
+				otherPost.getSubreddit().equals(subreddit))
+			{
+				return true;
+			}
 			return false;
 		} 
    }
