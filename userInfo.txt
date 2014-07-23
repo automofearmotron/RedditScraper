@@ -1,3 +1,4 @@
-User Name = yourAccountName
-Password = ************
-botcode = WRmKPqOCYRXPQ-your identifier here
+User Name = 
+Password = 
+subreddit = (subreddit name, no slashes)
+botcode = blank
