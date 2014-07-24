@@ -611,6 +611,7 @@ public class redditScraper implements Runnable
             System.out.println("Bot Post Sucess");
             consoleRSPane.append("Bot Post Success");
          }
+			/*
 			try{
 				String commentsSubstringer = "/comments/";
 				String link = postIn.getLink();
@@ -633,7 +634,7 @@ public class redditScraper implements Runnable
 			{
 				consoleRSPane.append("Error posting links");
 			}
-			
+			*/
       }catch(Exception e)
       {
          System.out.println("Could not connect bot");
