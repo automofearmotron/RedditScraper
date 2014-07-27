@@ -24,7 +24,7 @@ public class RSControlPanel extends JFrame
 	private boolean api;
 	private JButton start;
 	private JButton stop;
-   private JButton clearConsole;
+	private JButton clearConsole;
 	private JRadioButton hotButton;
 	private JRadioButton freshButton;
 	private JRadioButton htmlButton;
@@ -37,38 +37,38 @@ public class RSControlPanel extends JFrame
 	private RSEditorPane consolePane;
 	private RSEditorPane deletePane;
 	private redditScraper scraper; 
-   private ArrayList<redditScraper> RSThreads = new ArrayList<redditScraper>();
+	private ArrayList<redditScraper> RSThreads = new ArrayList<redditScraper>();
 	
-   private int numThreads = 0;
+	private int numThreads = 0;
 	private String REDDIT_ROOT = "all";
 	
 	public RSControlPanel()
 	{
 		
 		try {
-	    for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-	        if ("Nimbus".equals(info.getName())) {
-	            UIManager.setLookAndFeel(info.getClassName());
-	            break;
-	        }
-	    }
-		} catch (Exception e) {
-		   
+			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+				if ("Nimbus".equals(info.getName())) {
+					UIManager.setLookAndFeel(info.getClassName());
+					break;
+			}
+			}
+		}catch(Exception e){   
 		}
-      WindowAdapter windowAdapter = new WindowAdapter()
-      {
-         public void windowClosing(WindowEvent we)
-         {
-            setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-         }
-      };
-      addWindowListener(windowAdapter);
+		
+		WindowAdapter windowAdapter = new WindowAdapter()
+		{
+			public void windowClosing(WindowEvent we)
+			{
+				setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			}
+		};
+		addWindowListener(windowAdapter);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		// The basic frame construction settings
 		setTitle("Reddit Scraper");
 		Toolkit toolkit =  Toolkit.getDefaultToolkit ();
- 		Dimension dim = toolkit.getScreenSize();
+		Dimension dim = toolkit.getScreenSize();
 		WIDTH = dim.width / 2;
 		HEIGHT = dim.height / 2;
 		setBounds(0, 0,WIDTH,HEIGHT);
@@ -117,9 +117,9 @@ public class RSControlPanel extends JFrame
 		});
 		add(stop,c);
       
-      c.gridx=4;
+		c.gridx=4;
       
-      clearConsole = new JButton("Clear Console");
+		clearConsole = new JButton("Clear Console");
 		clearConsole.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e)
 			{
@@ -186,58 +186,58 @@ public class RSControlPanel extends JFrame
 		consolePane.setContentType("text/html");
 	   consolePane.setEditable(false);
 	   consolePane.addHyperlinkListener(new HyperlinkListener() {
-           @Override
-           public void hyperlinkUpdate(HyperlinkEvent hle) {
-			  		System.out.println("Description: " + hle.getDescription() +
-											 "Event Type: " + hle.getEventType());
-               if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
-                   System.out.println("LINK CLICKED" + hle.getURL());
-                   Desktop desktop = Desktop.getDesktop();
-                   try {
-						 	String url = hle.getDescription();
-						 	 String httpHeader = "";
-							 if(url.contains("http://") == false && url.contains("www.") == false)
-							 {
-							 	httpHeader = "http://";
-							 }
-                      String URIConversion = httpHeader + hle.getDescription();
-                      URIConversion = URIConversion.trim();
-						 	 URI website = new URI(URIConversion);
-                      desktop.browse(website);
-                   } catch (Exception ex) {
-                       ex.printStackTrace();
-                   }
-               }
-           }
-       });
+			@Override
+			public void hyperlinkUpdate(HyperlinkEvent hle) {
+				System.out.println("Description: " + hle.getDescription() +
+											"Event Type: " + hle.getEventType());
+				if(HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
+					System.out.println("LINK CLICKED" + hle.getURL());
+					Desktop desktop = Desktop.getDesktop();
+					try {
+						String url = hle.getDescription();
+						String httpHeader = "";
+						if(url.contains("http://") == false && url.contains("www.") == false)
+						{
+							httpHeader = "http://";
+						}
+						String URIConversion = httpHeader + hle.getDescription();
+						URIConversion = URIConversion.trim();
+						URI website = new URI(URIConversion);
+							desktop.browse(website);
+						}catch(Exception ex) {
+							ex.printStackTrace();
+						}
+					}
+			}
+		});
 		deletePane = new RSEditorPane();
 		deletePane.setContentType("text/html");
-	   deletePane.setEditable(false);
-	   deletePane.addHyperlinkListener(new HyperlinkListener() {
-           @Override
-           public void hyperlinkUpdate(HyperlinkEvent hle) {
-			  		System.out.println("Description: " + hle.getDescription() +
-											 "Event Type: " + hle.getEventType());
-               if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
-                   System.out.println("LINK CLICKED" + hle.getURL());
-                   Desktop desktop = Desktop.getDesktop();
-                   try {
-						 	String url = hle.getDescription();
-						 	 String httpHeader = "";
-							 if(url.contains("http://") == false && url.contains("www.") == false)
-							 {
-							 	httpHeader = "http://";
-							 }
-                      String URIConversion = httpHeader + hle.getDescription();
-                      URIConversion = URIConversion.trim();
-						 	 URI website = new URI(URIConversion);
-                      desktop.browse(website);
-                   } catch (Exception ex) {
-                       ex.printStackTrace();
-                   }
-               }
-           }
-       });
+		deletePane.setEditable(false);
+		deletePane.addHyperlinkListener(new HyperlinkListener() {
+			@Override
+			public void hyperlinkUpdate(HyperlinkEvent hle) {
+				System.out.println("Description: " + hle.getDescription() +
+											"Event Type: " + hle.getEventType());
+				if(HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
+					System.out.println("LINK CLICKED" + hle.getURL());
+					Desktop desktop = Desktop.getDesktop();
+					try {
+						String url = hle.getDescription();
+						String httpHeader = "";
+						if(url.contains("http://") == false && url.contains("www.") == false)
+						{
+							httpHeader = "http://";
+						}
+						String URIConversion = httpHeader + hle.getDescription();
+						URIConversion = URIConversion.trim();
+						URI website = new URI(URIConversion);
+						desktop.browse(website);
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+				}
+			}
+		});
 		JSplitPane split = new JSplitPane();
 		JScrollPane sp = new JScrollPane(consolePane);
 		split.setLeftComponent(sp);
@@ -249,34 +249,32 @@ public class RSControlPanel extends JFrame
 	
 	public void startAThread()
 	{
-      if(numThreads <= 4)
-      {
-   		scraper = new redditScraper();
-         RSThreads.add(scraper);
-   		scraper.setRedditLocation(redditLocationField.getText());
+		if(numThreads <= 4)
+		{
+			scraper = new redditScraper();
+			RSThreads.add(scraper);
+			scraper.setRedditLocation(redditLocationField.getText());
 			scraper.setSubmitSubreddit(subredditField.getText());
-   		scraper.setConsoleRSPane(consolePane);
-   		scraper.setDeleteRSPane(deletePane);
+			scraper.setConsoleRSPane(consolePane);
+			scraper.setDeleteRSPane(deletePane);
 			scraper.setUseAPIRequests(api);
 			scraper.setSearchTopPosts(hot);
 			scraper.setIsSubredditAll(all);
-   		activeThread = new Thread(scraper);
-   		activeThread.start();
-         numThreads++;
-      }
-		
+			activeThread = new Thread(scraper);
+			activeThread.start();
+			numThreads++;
+		}
 	}
 	
 	public void stopAThread()
 	{
 		try{
-         for(int i = 0;i < RSThreads.size();i++)
-         {
-			   RSThreads.get(i).setWatching(false);
-			   consolePane.append("Stopping thread # " + i + ". Threads must run their course before stopping");
-         }
+			for(int i = 0;i < RSThreads.size();i++)
+			{
+				RSThreads.get(i).setWatching(false);
+				consolePane.append("Stopping thread # " + i + ". Threads must run their course before stopping");
+		}
 		}catch(Exception e){
-		
 		}
 	}
 	public static void main(String[] args)
@@ -317,7 +315,8 @@ public class RSControlPanel extends JFrame
 					htmlButton.setSelected(true);
         		}else{
 					all = false;
-					
+					apiButton.setSelected(true);
+					api = true;
 				}
 				
 			}
