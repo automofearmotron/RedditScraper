@@ -123,7 +123,7 @@ public class RSControlPanel extends JFrame
 		clearConsole.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e)
 			{
-				consolePane.setBody("");
+				consolePane.setBody(" ");
 			}
 		});
       
@@ -249,7 +249,7 @@ public class RSControlPanel extends JFrame
 	
 	public void startAThread()
 	{
-		if(numThreads <= 4)
+		if(numThreads <= 8)
 		{
 			scraper = new redditScraper();
 			RSThreads.add(scraper);
@@ -288,11 +288,11 @@ public class RSControlPanel extends JFrame
 		{
 			Object source = e.getItemSelectable();
 			
-			if(source == api)
+			if(source == apiButton)
 			{
 				api = true;
 				html = false;
-			}else if(source == html){
+			}else if(source == htmlButton){
 				html = true;
 				api = false;
 			}else if(source == freshButton){

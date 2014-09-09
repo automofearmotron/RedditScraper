@@ -30,8 +30,13 @@ public class RSEditorPane extends JTextPane
 		
 		public synchronized void append(String sIn)
 		{
-			body = pStart + sIn + pEnd + body;
-			updatePane();
+			if(body.length() < 3000)
+			{
+				body = pStart + sIn + pEnd + body;
+				updatePane();
+			}else{
+				body = pStart + sIn + pEnd;
+			}
 		}
 		
 		public void updatePane()
