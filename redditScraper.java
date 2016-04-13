@@ -11,11 +11,7 @@
 	
 	p.s.
 	Lot's of thanks to a guy named Karan who had a nifty Java API wrapper on Github. Saved me a lot of time.
-*/
-
-
-
-import javax.swing.*;
+*/import javax.swing.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -50,7 +46,7 @@ public class redditScraper implements Runnable
 	private String tabIndexFinder = "tabindex=\"1\" >";
 	private String nextPage = "";
 	private String redditLocation = "";
-	private String redditRoot = "http://www.reddit.com/r/";
+	private String redditRoot = "https://www.reddit.com/r/";
 	private String userName = "";
 	private String password = "";
 	private String submitSubreddit = "";
@@ -74,13 +70,15 @@ public class redditScraper implements Runnable
 	// Don't set the interval too low, you will make Reddit mad
 	private int intervalPerPage = 3000;
 	private int scourIntervalMinutes = 1;
-	private int scourIntervalSeconds = 25;
+	private int scourIntervalSeconds = 30;
+   private int scourIntervalSecondsAll = 50;
 	private int maxDeletesPerScour = 10;
 	private int postsPerView = 25;
 	private int currentRanking = 1;
 	private int iterations = 4;
 	private int lowEndScour = (iterations * postsPerView) - ((iterations * postsPerView)/20);
 	private int apiLowEndScour = 22;
+   private int apiLowEndScoutAll = 95;
 	private int logCount = 0;
 	
 	private User user;
@@ -142,8 +140,8 @@ public class redditScraper implements Runnable
 						// kindly asks to minimize requests to a certain amount in a certain
 						// time.
 						ArrayList<RedditPost> subredditCheck = new ArrayList<RedditPost>();
-						System.out.println("Scraping Subreddit : (" + redditRoot + currentPost.getSubreddit() + ") in > " + 
-													lowEndScour + " scour");
+						//System.out.println("Scraping Subreddit : (" + redditRoot + currentPost.getSubreddit() + ") in > " + 
+						//							lowEndScour + " scour");
 						consoleRSPane.append("Scraping Subreddit : (" + redditRoot + currentPost.getSubreddit() + ") in > " + 
 													lowEndScour + " scour");
 						// Increase iteration to check the top 125, just to be sure
@@ -153,12 +151,12 @@ public class redditScraper implements Runnable
 						iterations--;
 						*/
 						subredditCheck = apiScrapePages(currentPost.getSubreddit(), subredditCheck);
-						System.out.println("Current post is " + currentPost.getTitle() + "\n" + currentPost.getSubreddit() + 
-                                     "\n" + currentPost.getLink());
+						//System.out.println("Current post is " + currentPost.getTitle() + "\n" + currentPost.getSubreddit() + 
+                  //                   "\n" + currentPost.getLink());
 						if(subredditCheck.contains(currentPost) == false)
 						{
-							System.out.println("Adding deleted post : " + currentPost.getTitle() + "\n" + currentPost.getSubreddit() +
-                                          "\n" + currentPost.getLink());
+							//System.out.println("Adding deleted post : " + currentPost.getTitle() + "\n" + currentPost.getSubreddit() +
+                  //                        "\n" + currentPost.getLink());
 							deletedInCheck.add(currentPost);
 						}else{
                   /*
@@ -171,9 +169,13 @@ public class redditScraper implements Runnable
                   }
 					}
 				}else{
-						if(currentPost.getRanking() < apiLowEndScour)
+                  int lowEnd = 22;
+                  if(currentPost.getSubreddit().equals("all") || currentPost.getSubreddit().equals("undelete")){
+                     lowEnd = apiLowEndScoutAll;
+                  }
+						if(currentPost.getRanking() < lowEnd)
 						{
-							System.out.println("Adding deleted post : " + currentPost.toString());
+							//System.out.println("Adding deleted post : " + currentPost.toString());
 							deletedInCheck.add(currentPost);
 						}/*else if(currentPost.getRanking() == apiLowEndScour){														This section is unreliable, needs work.
 							ArrayList<RedditPost> subredditCheck = new ArrayList<RedditPost>();
@@ -282,7 +284,15 @@ public class redditScraper implements Runnable
 					currentPost.setRanking(i + 1);
 					currentPost.setLink("http://www.reddit.com" + clone.getPermalink());
 					currentPost.setNumberOfComments(Long.toString(clone.getCommentCount()) + " comments");
-					currentPost.setSubreddit(redditLocation);
+               currentPost.setLocked(clone.getLocked());
+               if(redditLocation.equals("all")){
+                 // System.out.println("Setting /all subreddit to: " + clone.getSubreddit());
+                  currentPost.setSubreddit(redditLocation);
+                  currentPost.setSubSubreddit(clone.getSubreddit());
+               }else{
+					   currentPost.setSubreddit(redditLocation);
+               }
+					//currentPost.setSubreddit(redditLocation);
 					arrayToFill.add(currentPost);
 					//System.out.println(currentPost.toString());
 				}
@@ -301,12 +311,15 @@ public class redditScraper implements Runnable
 		}else{
 			consoleRSPane.append("Array didn't fill completely in: " + redditLocation);
 		}
-		
+      int sleepTime = scourIntervalSeconds;
+		if(locationIn.equals("all") || locationIn.equals("undelete")){
+         sleepTime = scourIntervalSecondsAll;
+      }
 		//System.out.println("Sleeping " + scourIntervalSeconds + " seconds");
-		consoleRSPane.append("Sleeping " + scourIntervalSeconds + " seconds");
+		consoleRSPane.append("Sleeping " + sleepTime + " seconds");
 
 		try{
-			TimeUnit.SECONDS.sleep(scourIntervalSeconds);
+			TimeUnit.SECONDS.sleep(sleepTime);
 		}catch(InterruptedException e){
 		}
 	}
@@ -334,7 +347,14 @@ public class redditScraper implements Runnable
 					currentPost.setRanking(i + 1);
 					currentPost.setLink("http://www.reddit.com" + clone.getPermalink());
 					currentPost.setNumberOfComments(Long.toString(clone.getCommentCount()) + " comments");
-					currentPost.setSubreddit(locationIn);
+               currentPost.setLocked(clone.getLocked());
+               if(locationIn.equals("all")){
+                 // System.out.println("Setting /all subreddit to: " + clone.getSubreddit());
+                  currentPost.setSubreddit(locationIn);
+                  currentPost.setSubSubreddit(clone.getSubreddit());
+               }else{
+					   currentPost.setSubreddit(locationIn);
+               }
 					arrayToFill.add(currentPost);
 					//System.out.println("API : http://www.reddit.com" + clone.getPermalink());
 				}
@@ -358,7 +378,7 @@ public class redditScraper implements Runnable
 	{
 		// Perform delete checks after pastArray has been filled
 		
-		System.out.println("Comparing Data Sets for deletes...");
+		//System.out.println("Comparing Data Sets for deletes...");
 		ArrayList<RedditPost> deletesToAdd = comparePostArrays(postArray,pastArray);
 		
 		if(pastArray.size() != 0 && deletesToAdd.size() <= maxDeletesPerScour)
@@ -368,7 +388,7 @@ public class redditScraper implements Runnable
 			{
 				if(deletedArray.contains(deletesToAdd.get(i)) == false)
 				{
-					System.out.println("Adding Deleted post: + " + deletesToAdd.get(i) + "\n");
+					//System.out.println("Adding Deleted post: + " + deletesToAdd.get(i) + "\n");
 					deletedArray.add(deletesToAdd.get(i));
 				}
 			}
@@ -404,10 +424,10 @@ public class redditScraper implements Runnable
 				}else{
 					if(postArray.contains(deletedArray.get(i)) == false)
 					{
-						System.out.println("Adding Check to " + deletedArray.get(i).toString() + " to submit\n");
+						//System.out.println("Adding Check to " + deletedArray.get(i).toString() + " to submit\n");
 						deletedArray.get(i).addCheck();
 					}else{
-						System.out.println("Found post : " + deletedArray.get(i).toString() + " in double check \n");
+						//System.out.println("Found post : " + deletedArray.get(i).toString() + " in double check \n");
 						deletedArray.get(i).setReadyToRemove();
 					}
 				}
@@ -423,7 +443,7 @@ public class redditScraper implements Runnable
 				RedditPost temp = it.next(); // Add this line in your code
 				if (temp.isReadyToRemove())
 				{
-					System.out.println("Removing : " + temp.toString() + " from deleted submissions");
+					//System.out.println("Removing : " + temp.toString() + " from deleted submissions");
 					it.remove();
 				}
 				i++;
@@ -447,7 +467,7 @@ public class redditScraper implements Runnable
 		postArray.clear();    
 		currentRanking = 1;
 		
-		System.out.println("Deletes In Queue = " + deletedArray.size());
+		//System.out.println("Deletes In Queue = " + deletedArray.size());
 		consoleRSPane.append("Deletes In Queue = " + deletedArray.size());
 	}
 	
@@ -482,7 +502,6 @@ public class redditScraper implements Runnable
 						{
 							boolean sentinel = false;
 							String lineAdd = in.readLine();            
-							
 							while(sentinel == false)
 							{
 								if(lineAdd != null)
@@ -615,7 +634,7 @@ public class redditScraper implements Runnable
 	// append given post to given file
 	public synchronized void appendSingleDelete(File fileIn, RedditPost postIn)
 	{
-		System.out.println("Appending delete File: " + fileIn.getAbsolutePath());
+		//System.out.println("Appending delete File: " + fileIn.getAbsolutePath());
 		BufferedWriter out = null;
 		Boolean postIt = false;
 		
@@ -626,15 +645,15 @@ public class redditScraper implements Runnable
 			if(postIn.isReadyToSubmit())
 			{
             subredditCheck = apiScrapePages(postIn.getSubreddit(), subredditCheck);
-				System.out.println("Current subreddit is " + postIn.getSubreddit());
+				//System.out.println("Current subreddit is " + postIn.getSubreddit());
             for(int j = 0;j < subredditCheck.size();j++)
             {
-               System.out.println("Scheck: " + subredditCheck.get(j).getTitle() + "\n" + subredditCheck.get(j).getSubreddit() + 
-                                    "\n" + subredditCheck.get(j).getLink());
+               //System.out.println("Scheck: " + subredditCheck.get(j).getTitle() + "\n" + subredditCheck.get(j).getSubreddit() + 
+               //                     "\n" + subredditCheck.get(j).getLink());
             }
 				if(subredditCheck.contains(postIn) == false && postIn.getRanking() < 98)
 				{
-					System.out.println("Adding deleted post : " + postIn.toString());
+					//System.out.println("Adding deleted post : " + postIn.toString());
                out.append(postIn.toString());
    				deleteRSPane.append(postIn.toString());
    				// add html anchors to make clickable links in logs and delete pane
@@ -665,7 +684,11 @@ public class redditScraper implements Runnable
 			{
 			try{
 				user.connect();
-				user.submitLink(postIn.toString(),postIn.getLink(),submitSubreddit);
+            //if(postIn.getSubreddit().equals("all")){
+               //user.submitLink(postIn.toString(),postIn.getLink(),postIn.getSubreddit());
+            //}else{
+				   user.submitLink(postIn.toString(),postIn.getLink(),submitSubreddit);
+            //}
 				// If you require captcha fill-in, this will generate a .png of the appropriate captcha. This feature will
 				// be useful if your bot isn't posting and you don't know why. Karma, baby. It's the karma.
 				
@@ -677,7 +700,7 @@ public class redditScraper implements Runnable
 					String iden = cappyCap.newCaptcha(user);
 					captchaDownloader.getCaptchaImage(iden);
 				}else{
-					System.out.println("Bot Post Sucess");
+					//System.out.println("Bot Post Sucess");
 					consoleRSPane.append("Bot Post Success");
 				}
 				// This is the start of the code for getting the comments from the deleted post and posting the top on the undelete post.
@@ -818,16 +841,18 @@ public class redditScraper implements Runnable
       private String differentHyphen = "â€“";
 		private String eyeWithADotOnTop = "Ä°";
 		private String stupidApostrophe = "â€˜";
-		
+		private String funkyQuote = "â€";
 		
 		
 		private String title;
 		private String linkLocation;
 		private String subreddit;
+      private String subsubreddit;
 		private String numberOfComments;
 		private int ranking;
 		private boolean readyToSubmit;
 		private boolean readyToRemove;
+      private boolean locked;
 		
 		int checks;
 		
@@ -836,6 +861,7 @@ public class redditScraper implements Runnable
 			title = "";
 			linkLocation = "";
 			subreddit = "";
+         subsubreddit = "";
 			numberOfComments = "0";
 			ranking = 0;
 			readyToSubmit = false;
@@ -869,6 +895,7 @@ public class redditScraper implements Runnable
 			titleIn = titleIn.replace(differentHyphen,"-");
 			titleIn = titleIn.replace(eyeWithADotOnTop,"\u0049");
 			titleIn = titleIn.replace(stupidApostrophe,"‘");
+         titleIn = titleIn.replace(funkyQuote,"\"");
          //titleIn = titleIn.replace(accentE,"\\u201");
 			
 			if(titleIn.length() >= 250)
@@ -901,6 +928,16 @@ public class redditScraper implements Runnable
 			subreddit = subredditIn;
 		}
       
+      public String getSubSubreddit()
+		{
+			return subsubreddit;
+		}
+      
+		public void setSubSubreddit(String subredditIn)
+		{
+			subsubreddit = subredditIn;
+		}
+      
 		public String getNumberOfComments()
 		{
 			return numberOfComments;
@@ -921,9 +958,36 @@ public class redditScraper implements Runnable
 			ranking = rankingIn;
 		}
       
+      public boolean getLocked(){
+         return locked;
+      }
+      
+      public void setLocked(boolean lockedIn){
+         locked = lockedIn;
+      }
+      
 		public String toString()
 		{
-			return "[#" + ranking + "]" + "\t" + title + "\t" + "[" + subreddit + "]\t" + numberOfComments;
+         String lockedString = "";
+         if(locked){
+            lockedString = "Locked:";
+         }
+         
+         if(subsubreddit.equals("")){
+            String outString = lockedString + "[#" + ranking + "]" + "\t" + title + "\t" + "[" + subreddit + "]\t" + numberOfComments;
+   			if(outString.length() >= 290)
+   			{
+   				outString = outString.substring(0,290);
+   			}
+   			return outString;
+         }else{
+            String outString = lockedString + "[#" + ranking + "]" + "\t" + title + "\t" + "[" + subsubreddit + "]\t" + numberOfComments;
+   			if(outString.length() >= 290)
+   			{
+   				outString = outString.substring(0,290);
+   			}
+            return outString;
+         }
 		}
 		
 		public void setReadyToSubmit()
@@ -959,7 +1023,7 @@ public class redditScraper implements Runnable
 			
 			RedditPost otherPost = (RedditPost)postIn;
 			if(otherPost.getLink().equals(linkLocation) && otherPost.getTitle().equals(title) && 
-				otherPost.getSubreddit().equals(subreddit))
+				otherPost.getSubreddit().equals(subreddit) && otherPost.getLocked() == locked)
 			{
 				return true;
 			}

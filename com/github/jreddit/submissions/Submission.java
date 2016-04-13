@@ -43,6 +43,7 @@ public class Submission extends Thing {
     private long upVotes;
     private long downVotes;
     private long score;
+    private boolean locked;
 
     public Submission() {
         restClient = new HttpRestClient();
@@ -69,6 +70,7 @@ public class Submission extends Thing {
             setDownVotes(safeJsonToLong(obj.get("downs")));
             setScore(safeJsonToLong(obj.get("score")));
             setCommentCount(safeJsonToLong(obj.get("num_comments")));
+            setLocked(safeJsonToBoolean(obj.get("locked")));
 
         } catch (Exception e) {
             System.err.println("Error creating Submission");
@@ -91,6 +93,10 @@ public class Submission extends Thing {
 
     public void setAuthor(String author) {
         this.author = author;
+    }
+    
+    public void setLocked(Boolean locked) {
+        this.locked = locked;
     }
 
     public void setCreatedUTC(double createdUTC) {
@@ -139,6 +145,10 @@ public class Submission extends Thing {
 
     public String getURL() {
         return url;
+    }
+    
+    public Boolean getLocked() {
+        return locked;
     }
 
     public String getPermalink() {

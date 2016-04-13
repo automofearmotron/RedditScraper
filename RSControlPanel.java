@@ -188,10 +188,10 @@ public class RSControlPanel extends JFrame
 	   consolePane.addHyperlinkListener(new HyperlinkListener() {
 			@Override
 			public void hyperlinkUpdate(HyperlinkEvent hle) {
-				System.out.println("Description: " + hle.getDescription() +
-											"Event Type: " + hle.getEventType());
+				//System.out.println("Description: " + hle.getDescription() +
+											//"Event Type: " + hle.getEventType());
 				if(HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
-					System.out.println("LINK CLICKED" + hle.getURL());
+					//System.out.println("LINK CLICKED" + hle.getURL());
 					Desktop desktop = Desktop.getDesktop();
 					try {
 						String url = hle.getDescription();
@@ -216,10 +216,10 @@ public class RSControlPanel extends JFrame
 		deletePane.addHyperlinkListener(new HyperlinkListener() {
 			@Override
 			public void hyperlinkUpdate(HyperlinkEvent hle) {
-				System.out.println("Description: " + hle.getDescription() +
-											"Event Type: " + hle.getEventType());
+				//System.out.println("Description: " + hle.getDescription() +
+											//"Event Type: " + hle.getEventType());
 				if(HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
-					System.out.println("LINK CLICKED" + hle.getURL());
+					//System.out.println("LINK CLICKED" + hle.getURL());
 					Desktop desktop = Desktop.getDesktop();
 					try {
 						String url = hle.getDescription();

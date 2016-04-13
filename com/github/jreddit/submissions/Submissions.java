@@ -8,6 +8,7 @@ import com.github.jreddit.utils.restclient.RestClient;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
+import java.util.concurrent.TimeUnit;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ public class Submissions {
      */
     public List<Submission> getSubmissions(String redditName,
                        Popularity type, Page frontpage, User user) throws IOException, ParseException {
-
+        System.out.println("TET");
         LinkedList<Submission> submissions = new LinkedList<Submission>();
         String urlString = "/r/" + redditName;
 
@@ -63,20 +64,44 @@ public class Submissions {
 
         //TODO Implement Pages
 
+        String stringBase = urlString;
         urlString += ".json";
-
-        JSONObject object = (JSONObject)  restClient.get(urlString, user.getCookie()).getResponseObject();
-        JSONArray array = (JSONArray) ((JSONObject) object.get("data")).get("children");
-
-        JSONObject data;
-        Submission submission;
-        for (Object anArray : array) {
-            data = (JSONObject) anArray;
-            data = ((JSONObject) data.get("data"));
-            submission = new Submission(data);
-            submission.setUser(user);
-            submissions.add(submission);
-
+        String afterString = "";
+        System.out.println("Beginning URL: " + urlString);
+        if(redditName.equals("all") || redditName.equals("undelete")){
+           for(int i = 0;i <= 3;i++){
+              JSONObject object = (JSONObject)  restClient.get(urlString, user.getCookie()).getResponseObject();
+              JSONArray array = (JSONArray) ((JSONObject) object.get("data")).get("children");
+              JSONObject data;
+              Submission submission;
+              for (Object anArray : array) {
+                  data = (JSONObject) anArray;
+                  data = ((JSONObject) data.get("data"));
+                  submission = new Submission(data);
+                  submission.setUser(user);
+                  submissions.add(submission);
+              }
+              afterString = safeJsonToString(((JSONObject) object.get("data")).get("after"));
+              urlString = stringBase + "/.json?count=25&after=" + afterString;
+           }
+           try{
+      			TimeUnit.SECONDS.sleep(3);
+      		}catch(InterruptedException e){
+      		}
+        }else{
+            JSONObject object = (JSONObject)  restClient.get(urlString, user.getCookie()).getResponseObject();
+           JSONArray array = (JSONArray) ((JSONObject) object.get("data")).get("children");
+           JSONObject data;
+           Submission submission;
+           for (Object anArray : array) {
+               data = (JSONObject) anArray;
+               data = ((JSONObject) data.get("data"));
+               submission = new Submission(data);
+               submission.setUser(user);
+               submissions.add(submission);
+           }
+           afterString = safeJsonToString(((JSONObject) object.get("data")).get("after"));
+           urlString = stringBase + "/.json?count=25&after=" + afterString;
         }
 
         return submissions;

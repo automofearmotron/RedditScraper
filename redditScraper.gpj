@@ -1,0 +1,34 @@
+!999;s
+J
+SAU0PATH+=%<JGRASP_PATHS>%;\012PATH=+%;%<JGRASP_C_PATHS>\012CYGWIN=nodosfilewarning
+SCU0PATH+=%<JGRASP_PATHS>%;\012PATH=+%;%<JGRASP_C_PATHS>\012CYGWIN=nodosfilewarning
+S+U0PATH+=%<JGRASP_PATHS>%;\012PATH=+%;%<JGRASP_C_PATHS>\012CYGWIN=nodosfilewarning
+SJU0CLASSPATH=+%;%<EXTENSION_CLASSPATHS>\012CLASSPATH+=%<JGRASP_CLASSPATHS>%;\012File\012CLASSPATH+=.%;\012ProjectOrFile\012PATH+=%<JAVA_BIN_DIR>%;\012PATH+=%<JGRASP_PATHS>%;\012Debug +Debug_Applet\012CLASSPATH=+%;%<INJECTION_CLASSPATHS>\012Compile\012NOT_FOUND_MESSAGE==Make sure you have the full JDK, not just the JRE, installed.\\nThe JDK is available from http://www.oracle.com/technetwork/java/index.html.\012Run_Applet +Debug_Applet\012ADD_APPLETVIEWER_CLASSPATH==Y\012Document\012CLASSPATH=+%;%<TOOL_CLASSPATHS>\012CLASSPATH+=%<CLASSES_DIR>%;\012
+SOU0PATH+=%<JGRASP_PATHS>%;\012PATH=+%;%<JGRASP_C_PATHS>\012CYGWIN=nodosfilewarning
+SyU0PATH+=%<PYTHON_PATH>%;\012PATH+=%<JGRASP_PATHS>%;\012CYGWIN=nodosfilewarning
+SPU0
+s#i0
+s#k0
+s#j0
+s#l0
+!116;u
+a0	b68	c255	f%\011RedditScraper.jar	g%\011RedditScraper.zip	hManifest-Version\0111.0\011Main-Class\011RSControlPanel!202;g
+%\011RSControlPanel.java
+%\011json-simple-1.1.1.jar
+%\011redditScraper.java
+%\011httpclient-4.3.4.jar
+%\011httpcore-4.3.2.jar
+%\011commons-logging-1.1.3.jar
+%\011org%s
+%\011com%s
+%\011RSEditorPane.java
+!202;f
+%\011RSControlPanel.java
+%\011json-simple-1.1.1.jar
+%\011redditScraper.java
+%\011httpclient-4.3.4.jar
+%\011httpcore-4.3.2.jar
+%\011commons-logging-1.1.3.jar
+%\011org%s
+%\011com%s
+%\011RSEditorPane.java
